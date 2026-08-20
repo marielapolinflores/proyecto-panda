@@ -3,7 +3,11 @@ import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
-function MainLayout({onLogout}) {
+interface MainLayoutProps {
+    onLogout: () => void;
+}
+
+function MainLayout({onLogout}: MainLayoutProps) {
     return (
         <>
         <Navbar onLogout={onLogout}/>
