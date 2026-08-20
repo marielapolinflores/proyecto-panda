@@ -21,6 +21,7 @@ interface Cancion {
 function Dashboard() {
   const [activeTab, setActiveTab] = useState<'pandas' | 'numpy' | 'reportes' | 'pn'>('pandas');
   const [data, setData] = useState<Cancion[]>([]);
+  const [originalData, setOriginalData] = useState<Cancion[]>([]); // Preserva la copia original del CSV
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [numpyOutput, setNumpyOutput] = useState<string>('');
   const [pnOutput, setPnOutput] = useState<string>('');
@@ -53,6 +54,7 @@ function Dashboard() {
     });
 
     setData(parsedData);
+    setOriginalData(parsedData); // Guarda la fuente limpia de datos
   };
 
   // Carga de CSV manual
@@ -68,12 +70,13 @@ function Dashboard() {
     reader.readAsText(file);
   };
 
-  // Procedimientos Pandas
-  const pandasProc1 = () => setData((prev) => prev.filter((c) => c.BPM > 120));
-  const pandasProc2 = () => setData((prev) => [...prev].sort((a, b) => b.Popularity - a.Popularity).slice(0, 5));
-  const pandasProc3 = () => setData((prev) => prev.filter((c) => c.Energy < 50));
-  const pandasProc4 = () => setData((prev) => [...prev].sort((a, b) => b.Danceability - a.Danceability));
-  const pandasProc5 = () => setData((prev) => prev.filter((c) => c.Popularity >= 85));
+  // Procedimientos Pandas (utilizan originalData para no destruir los datos cargados)
+  const resetFiltros = () => setData(originalData);
+  const pandasProc1 = () => setData(originalData.filter((c) => c.BPM > 120));
+  const pandasProc2 = () => setData([...originalData].sort((a, b) => b.Popularity - a.Popularity).slice(0, 5));
+  const pandasProc3 = () => setData(originalData.filter((c) => c.Energy < 50));
+  const pandasProc4 = () => setData([...originalData].sort((a, b) => b.Danceability - a.Danceability));
+  const pandasProc5 = () => setData(originalData.filter((c) => c.Popularity >= 85));
 
   // Procedimientos NumPy
   const numpyProc1 = () => {
@@ -275,6 +278,7 @@ function Dashboard() {
                 📁 CARGAR CSV (LIPPANDAS)
                 <input type="file" accept=".csv" onChange={handleFileUpload} style={{ display: 'none' }} />
               </label>
+              <button className="btn-action" onClick={resetFiltros}>Mostrar Todos</button>
               <button className="btn-action" onClick={pandasProc1}>P1: BPM &gt; 120</button>
               <button className="btn-action" onClick={pandasProc2}>P2: Top 5 Populares</button>
               <button className="btn-action" onClick={pandasProc3}>P3: Energía &lt; 50</button>
@@ -296,7 +300,7 @@ function Dashboard() {
                   </div>
                 ))
               ) : (
-                <p>No hay datos. Presiona el botón "📁 CARGAR CSV" para subir la información.</p>
+                <p>No hay datos disponibles para mostrar.</p>
               )}
             </div>
           </div>
