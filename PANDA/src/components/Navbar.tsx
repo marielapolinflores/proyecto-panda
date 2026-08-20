@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
-function Navbar({ onLogout }) {
+interface NavbarProps {
+    onLogout: () => void;
+}
+
+function Navbar({ onLogout }: NavbarProps) {
 
     const[ boxcerrar , setBoxCerrar ] = useState(false)
 
